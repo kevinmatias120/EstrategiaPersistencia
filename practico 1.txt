@@ -1,0 +1,75 @@
+CREATE DATABASE `Empresa`;
+USE `Empresa`;
+
+CREATE TABLE `Departamentos`(
+	`codDep` VARCHAR(4) NOT NULL,
+	`nombreDep` VARCHAR(20) NULL DEFAULT NULL,
+	`ciudad` VARChAR(15) NULL DEFAULT NULL,
+	`codDirector` VARCHAR(4) NOT NULL,
+	PRIMARY KEY(`codDep`)
+);
+
+CREATE TABLE `Empleados`(
+	`nDIEmp` VARCHAR(12) NOT NULL,
+	`nomEmp` VARCHAR(30) NULL DEFAULT NULL,
+	`sexEmp` CHAR(1) NULL DEFAULT NULL,
+	`fecNac` DATE NULL DEFAULT NULL,
+	`fecIncorporacion` DATE NULL DEFAULT NULL,
+	`salEmp` FLOAT NULL DEFAULT NULL,
+	`comision` FLOAT NULL DEFAULT NULL,
+	`cargoE` VARChAR(15) NULL DEFAULT NULL,
+	`jefeID` VARCHAR(12) NOT NULL,
+	`codDep` VARCHAR(4) NOT NULL,
+	PRIMARY KEY(`nDIEmp`)
+);
+
+ALTER TABLE `Empleados`
+	ADD CONSTRAINT `FK_Empleados_Departamentos` FOREIGN KEY (`codDep`) REFERENCES `Departamentos` (`codDep`);
+
+INSERT INTO `empresa`.`departamentos` (`codDep`, `nombreDep`,`ciudad`,`codDirector`) VALUES ('A1', 'BellaVista','Buenos Aires','B1');
+INSERT INTO `empresa`.`departamentos` (`codDep`, `nombreDep`,`ciudad`,`codDirector`) VALUES ('A2', 'Ventas','Santa Fe','B2');
+INSERT INTO `empresa`.`departamentos` (`codDep`, `nombreDep`,`ciudad`,`codDirector`) VALUES ('FF', 'NuevaVista','cordoba','B3');
+
+INSERT INTO `empresa`.`empleados` (`nDIEmp`, `nomEmp`, `sexEmp`, `salEmp`, `comision`, `cargoE`, `jefeID`, `codDep`) 
+VALUES ('Z1', 'julio', 'M', '500', '800', 'empleado', 'B1', 'A1');
+INSERT INTO `empresa`.`empleados` (`nDIEmp`, `nomEmp`, `sexEmp`, `salEmp`, `comision`, `cargoE`, `jefeID`, `codDep`) 
+VALUES ('Z2', 'maria', 'F', '550', '760', 'empleado', 'B1', 'A1');
+INSERT INTO `empresa`.`empleados` (`nDIEmp`, `nomEmp`, `sexEmp`, `salEmp`, `comision`, `cargoE`, `jefeID`, `codDep`) 
+VALUES ('Z3', 'marta', 'F', '1000', '900', 'supervisor', 'B1', 'A1');
+INSERT INTO `empresa`.`empleados` (`nDIEmp`, `nomEmp`, `sexEmp`, `salEmp`, `comision`, `cargoE`, `jefeID`, `codDep`) 
+VALUES ('Z4', 'eric', 'M', '2000', '600', 'gerente', 'B2', 'A2');
+INSERT INTO `empresa`.`empleados` (`nDIEmp`, `nomEmp`, `sexEmp`, `salEmp`, `comision`, `cargoE`, `jefeID`, `codDep`) 
+VALUES ('Z5', 'juan', 'M', '600', '810', 'empleado', 'B2', 'A2');¨
+
+/*1*/
+SELECT *  FROM empleados;
+/*2*/
+SELECT nombreDep  FROM departamentos;
+/*3*/
+SELECT nomEmp,cargoE,salEmp FROM empleados ORDER BY salEmp;
+/*4*/
+SELECT nomEmp FROM empleados WHERE comision > salEmp;
+/*5*/
+SELECT nomEmp FROM empleados WHERE comision <= (salEmp * 0.3);
+/*6*/
+SELECT nomEmp FROM empleados WHERE nomEmp > 'j' AND nomEmp < 'z';
+/*7*/
+SELECT nomEmp FROM empleados WHERE nomEmp NOT LIKE '%ma%';
+/*8*/
+SELECT * FROM empleados, departamentos 
+WHERE departamentos.codDep = empleados.codDep AND nomEmp LIKE 'ma%' AND (salEmp > 1000 OR comision > 0 )AND departamentos.nombreDep <> 'Ventas';
+/*9*/
+SELECT nomEmp, MAX(salEmp) AS 'salario mayor' FROM empleados;
+/*10*/
+SELECT  MAX(salEmp) AS 'salario mayor', MIN(salEmp) AS 'salario menor', MAX(salEmp) - MIN(salEmp) AS 'diferencia'  FROM empleados;
+/*11*/
+SELECT codDep, sexEmp, COUNT(*) FROM empleados GROUP BY codDep, sexEmp;
+/*12*/
+SELECT departamentos.codDep, nombreDep, COUNT(*) AS 'empleados'  FROM departamentos, empleados WHERE departamentos.codDep = empleados.codDep 
+GROUP BY departamentos.codDep HAVING COUNT(*) >= 3;
+/*14*/
+SELECT departamentos.codDep, departamentos.nombreDep FROM departamentos, empleados WHERE departamentos.codDep = empleados.codDep
+GROUP BY departamentos.codDep HAVING COUNT(*) = 0;
+/*15*/
+SELECT departamentos.nombreDep, SUM(empleados.salEmp) FROM departamentos, empleados WHERE departamentos.codDep = empleados.codDep
+GROUP BY departamentos.nombreDep ORDER BY SUM(empleados.salEmp) DESC LIMIT 1;
